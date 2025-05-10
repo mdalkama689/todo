@@ -1,11 +1,15 @@
-import React from 'react';
 import { Header } from './components/Header';
 import { TodoForm } from './components/TodoForm';
 import { TodoList } from './components/TodoList';
 import { TodoFilter } from './components/TodoFilter';
 import { useTodos } from './hooks/useTodos';
+import { useEffect, useState } from 'react';
+import MobileShare from './components/share/MobileShare';
+import TabShare from './components/share/TabShare';
 
 function App() {
+    const [deviceType, setDeviceType] = useState<"big" | "small">("big");
+
   const {
     todos,
     filter,
@@ -18,8 +22,22 @@ function App() {
     clearCompleted
   } = useTodos();
 
+    useEffect(() => {
+    const handleResize = () => {
+        setDeviceType(window.innerWidth < 1024 ? "small" : "big");
+    };
+
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 py-8 px-4">
+       {deviceType === "small" ? <MobileShare /> : <TabShare />}
       <div className="max-w-lg mx-auto">
         <Header totalTasks={stats.total} />
         
